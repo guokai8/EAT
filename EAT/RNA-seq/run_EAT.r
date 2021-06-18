@@ -1,0 +1,21 @@
+library(DESeq2)
+library(ggplot2)
+group<-read.delim("/Users/bioguo/Desktop/EAT_result/EAT_group_cluster.txt",sep="\t",row.names=1)
+df<-read.delim("counts.txt",sep="\t",skip=1,row.names=1)
+colnames(df)<-sub('\\_.*.bam','',colnames(df))
+colnames(df)<-sub('X','',colnames(df))
+dd<-df[,6:ncol(df)]
+dds<-DESeqDataSetFromMatrix(dd,DataFrame(condition),~condition)
+dds<-DESeq(dds,minReplicatesForReplace=Inf)
+rld<-rlogTransformation(dds)
+pca<-plotPCA(rld,return=T)
+percentVar <- round(100 * attr(pca, "percentVar"))
+pca$sample<-group$Group
+ggplot(pca,aes(PC1,PC2,color=condition,shape=sample))+geom_point(size=4)+xlab(paste0("PC1: ",percentVar[1],"%"))+ylab(paste("PC2: ",percentVar[2],"%"))
+ggsave(file="EAT_new.pdf")
+#check the housingkeeping genes expression:Ywhaz
+x<-barplot(as.numeric(assay(rld)["ENSRNOG00000008195",]),col=as.factor(condition))
+axis(1,at=x,labels=colnames(dd),las=2)
+dev.print(pdf,file="EAT_Ywhaz.pdf")
+x<-barplot(as.numeric(dd["ENSRNOG00000008195",]),col=as.factor(condition))
+axis(1,at=x,labels=colnames(dd),las=2)
