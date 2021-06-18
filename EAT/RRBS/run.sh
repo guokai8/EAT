@@ -1,17 +1,16 @@
-#!bin/bash
-#QC filtering
-for i in *_R1_001.fastq.gz; 
+for i in *_trimmed.fq.gz; 
 do 
-    n=${i%%_R1_001.fastq.gz}; 
-    java -jar /data/biotools/Trimmomatic/trimmomatic-0.36.jar PE -threads 50 -phred33 $i ${n}_R2_001.fastq.gz ${n}_R1_clean.fq.gz ${n}_R1_unpair.fq.gz ${n}_R2_clean.fq.gz ${n}_R2_unpair.fq.gz ILLUMINACLIP:/data/biotools/Trimmomatic/adapters/TruSeq3-PE-2.fa:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:40 HEADCROP:13;
+    bismark -L 32 -q --unmapped --ambiguous --phred33-quals --genome_folder /data/NGS/genomes/hisat2_annotation/Rat_EN/ -p 10 --multicore 5 $i ; 
 done
-#alignment
-for i in *_R1_clean.fq.gz 
+for i in *.bam
 do
- hisat2 --dta-cufflinks --rna-strandness RF -x /data/NGS/genomes/hisat2_annotation/Rat_EN/genome --known-splicesite-infile /data/NGS/genomes/hisat2_annotation/Rat_EN/genome.ss -p 40\
-     -1 $i -2 ${i%%_R1_clean.fq.gz}_R2_clean.fq.gz|samtools sort -@ 20 -o ${i%%_R1_clean.fq.gz}.bam -
+    samtools sort -@ 40 -o ${i%%.bam}.sort.bam $i
 done
-echo "All done"
-###count calcuate
-featureCounts -p -T 20 -s 2 -t exon -g gene_id -a /data/NGS/genomes/hisat2_annotation/Rat_EN/genes.gtf -o counts.txt *.bam
-
+for i in *.sort.bam
+do
+    samtools view -h $i >${i%%.bam}.sam
+done
+for i in *.sam; 
+do 
+    bismark_methylation_extractor -s --bedGraph --counts --buffer_size 50G --cytosine_report --genome_folder /data/NGS/genomes/hisat2_annotation/Rat_EN/ $i;rm -rf *sort.txt; 
+done
