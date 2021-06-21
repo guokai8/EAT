@@ -21,8 +21,15 @@ resru<-results(dds,contrast = c("condition","Ruskin_Group2","Ruskin_Group1"))
 library(richR)
 rtgo<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="GO")
 rtko<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="KEGG")
+#####
+rtgo<-as.data.frame(rtgo)
+rtko<-as.data.frame(rtko)
 ###Note we use transcript gene id so we need to replace the gene id with transcript id in the annotation file
-
+geneid<-read.table('EATdata/rat.txt',sep="\t",skip=1)
+colnames(geneid)<-c("TranID","GeneID")
+library(tidyverse)
+rtgo<-left_join(rtgo,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,GOALL,ONTOLOGYAL,Annot)
+rtko<-left_join(rtko,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,PATH,Annot)
 ######
 boko<-richKEGG(rownames(subset(resbo,padj<0.05)),rtko)
 bogo<-richGO(rownames(subset(resbo,padj<0.05)),rtgo)
