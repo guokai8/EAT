@@ -23,6 +23,8 @@ rutiles=tileMethylCounts(ruobj,win.size=1000,step.size=1000)
 ruDiff=calculateDiffMeth(rumeth,num.cores=30)
 # get all differentially methylated bases
 ruDiff25p=getMethylDiff(ruDiff,difference=25,qvalue=0.01)
+# we just focus on the no sex chromosome
+ruDiff25p=ruDiff25p[ruDiff25p$chr%in%c(1:20),]
 ###read annotation files
 gene.obj=readTranscriptFeatures("genes.bed")
 ###annotate the CpG sites
