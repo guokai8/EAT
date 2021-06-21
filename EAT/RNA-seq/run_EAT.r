@@ -35,4 +35,4 @@ boko<-richKEGG(rownames(subset(resbo,padj<0.05)),rtko)
 bogo<-richGO(rownames(subset(resbo,padj<0.05)),rtgo)
 ###
 write.csv(bogo,file="Site1vsSite2_GO.csv")
-write.csv(boko,file="Site1vsSite2_GO.csv")
+write.csv(boko,file="Site1vsSite2_KEGG.csv")
