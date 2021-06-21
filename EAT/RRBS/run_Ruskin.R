@@ -1,19 +1,28 @@
+##load packages
 library(methylKit)
 library(genomation)
+##get filenames
 filenames<-list.files(pattern="*.sam")
 rufile=as.list(filenames)
-ruobj<-processBismarkAln(location=rufile,sample.id=list("Ruskin_Group2","Ruskin_Group1","Ruskin_Group2","Ruskin_Group2","Ruskin_Group2","Ruskin_Group1","Ruskin_Group1","Ruskin_Group1","Ruskin_Group2","Ruskin_Group1","Ruskin_Group1","Ruskin_Group2"),assembly="rn6",
+##read sam files
+ruobj<-processBismarkAln(location=rufile,sample.id=list("Lubin_Group1","Ruskin_Group1","Lubin_Group1","Lubin_Group1", "Ruskin_Group1",
+                                                        "Lubin_Group1","Ruskin_Group1", "Ruskin_Group1","Lubin_Group1","Ruskin_Group1",
+                                                        "Lubin_Group1","Ruskin_Group1")
                        save.folder=NULL,save.context=NULL,read.context="CpG",
+                        mincov = 10,minqual = 20,
                        nolap=FALSE,phred64=FALSE,
-                       treatment=c(1,0,1,1,1,0,0,0,1,0,0,1))
+                       treatment=c(0,1,0,0,1,0,1,1,0,1,0,1))
+###merged files
 rumeth=unite(ruobj, destrand=FALSE)
+clusterSamples(rumeth)
+###windows for DMR
 rutiles=tileMethylCounts(ruobj,win.size=1000,step.size=1000)
-ruDiff=calculateDiffMeth(rumeth,num.cores=10)
-ruDiff25p.hyper=getMethylDiff(ruDiff,difference=25,qvalue=0.01,type="hyper")
-# get hypo methylated bases
-ruDiff25p.hypo=getMethylDiff(ruDiff,difference=25,qvalue=0.01,type="hypo")
+###calculate the differential CpGs
+ruDiff=calculateDiffMeth(rumeth,num.cores=30)
 # get all differentially methylated bases
 ruDiff25p=getMethylDiff(ruDiff,difference=25,qvalue=0.01)
+###read annotation files
 gene.obj=readTranscriptFeatures("genes.bed")
+###annotate the CpG sites
 rudiffAnn=annotateWithGeneParts(as(ruDiff25p,"GRanges"),gene.obj)
-save(list=ls(),file="Ruskin_EAT.rdata",compress=T)
+save(list=ls(),file="rl_rdata",compress=T)
