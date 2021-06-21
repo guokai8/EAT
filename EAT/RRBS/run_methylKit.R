@@ -27,4 +27,22 @@ ruDiff25p=getMethylDiff(ruDiff,difference=25,qvalue=0.01)
 gene.obj=readTranscriptFeatures("genes.bed")
 ###annotate the CpG sites
 rudiffAnn=annotateWithGeneParts(as(ruDiff25p,"GRanges"),gene.obj)
+rugene<-getAssociationWithTSS(rudiffAnn)
+library(richR)
+rtgo<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="GO")
+rtko<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="KEGG")
+#####
+rtgo<-as.data.frame(rtgo)
+rtko<-as.data.frame(rtko)
+###Note we use transcript gene id so we need to replace the gene id with transcript id in the annotation file
+geneid<-read.table('EATdata/rat.txt',sep="\t",skip=1)
+colnames(geneid)<-c("TranID","GeneID")
+library(tidyverse)
+rtgo<-left_join(rtgo,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,GOALL,ONTOLOGYAL,Annot)
+rtko<-left_join(rtko,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,PATH,Annot)
+######
+ruko<-richKEGG(unique(rugene$feature.name),rtko)
+rugo<-richGO(unique(rugene$feature.name)),rtgo)
+write.table(rugo,file="Site2vsSite3_GO.csv")
+write.table(ruko,file="Site2vsSite3_KEGG.csv")
 save(list=ls(),file="rl_rdata",compress=T)
