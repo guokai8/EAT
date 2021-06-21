@@ -19,8 +19,10 @@ reslu<-results(dds,contrast = c("condition","Lubin_Group2","Lubin_Group1"))
 resru<-results(dds,contrast = c("condition","Ruskin_Group2","Ruskin_Group1"))
 #####
 library(richR)
-rtgo<-buildAnnot(species="rat",keytype="SYMBOL",anntype="GO")
-rtko<-buildAnnot(species="rat",keytype="SYMBOL",anntype="KEGG")
+rtgo<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="GO")
+rtko<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="KEGG")
+###Note we use transcript gene id so we need to replace the gene id with transcript id in the annotation file
+
 ######
 boko<-richKEGG(rownames(subset(resbo,padj<0.05)),rtko)
 bogo<-richGO(rownames(subset(resbo,padj<0.05)),rtgo)
