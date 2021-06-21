@@ -14,9 +14,9 @@ pca$sample<-group$Group
 ggplot(pca,aes(PC1,PC2,color=condition,shape=sample))+geom_point(size=4)+xlab(paste0("PC1: ",percentVar[1],"%"))+ylab(paste("PC2: ",percentVar[2],"%"))
 ggsave(file="EAT_new.pdf")
 ######
-resbo<-results(dds,contrast = c("condition","Boison_Group1","Boison_Group2"))
-reslu<-results(dds,contrast = c("condition","Lubin_Group2","Lubin_Group1"))
-resru<-results(dds,contrast = c("condition","Ruskin_Group2","Ruskin_Group1"))
+resbo<-results(dds,contrast = c("condition","Boison_Group2","Ruskin_Group1"))
+reslu<-results(dds,contrast = c("condition","Boison_Group2","Lubin_Group1"))
+resru<-results(dds,contrast = c("condition","Ruskin_Group1","Lubin_Group1"))
 #####
 library(richR)
 rtgo<-buildAnnot(species="rat",keytype="ENSEMBL",anntype="GO")
@@ -30,6 +30,9 @@ colnames(geneid)<-c("TranID","GeneID")
 library(tidyverse)
 rtgo<-left_join(rtgo,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,GOALL,ONTOLOGYAL,Annot)
 rtko<-left_join(rtko,geneid,by=c('GeneID'='GeneID'))%>%select(TranID,PATH,Annot)
-######
+######just show one 
 boko<-richKEGG(rownames(subset(resbo,padj<0.05)),rtko)
 bogo<-richGO(rownames(subset(resbo,padj<0.05)),rtgo)
+###
+write.csv(bogo,file="Site1vsSite2_GO.csv")
+write.csv(boko,file="Site1vsSite2_GO.csv")
