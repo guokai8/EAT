@@ -1,3 +1,5 @@
+###This is the script for Site#2 and Site#3 test
+### other two script used same command with different name
 ##load packages
 library(methylKit)
 library(genomation)
