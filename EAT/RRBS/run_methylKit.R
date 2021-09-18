@@ -9,7 +9,8 @@ rufile=as.list(filenames)
 ##read sam files
 ruobj<-processBismarkAln(location=rufile,sample.id=list("Lubin_Group1","Ruskin_Group1","Lubin_Group1","Lubin_Group1", "Ruskin_Group1",
                                                         "Lubin_Group1","Ruskin_Group1", "Ruskin_Group1","Lubin_Group1","Ruskin_Group1",
-                                                        "Lubin_Group1","Ruskin_Group1")
+                                                        "Lubin_Group1","Ruskin_Group1"),
+                         assembly="rn6",
                        save.folder=NULL,save.context=NULL,read.context="CpG",
                         mincov = 10,minqual = 20,
                        nolap=FALSE,phred64=FALSE,
